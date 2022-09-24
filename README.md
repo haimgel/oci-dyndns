@@ -1,4 +1,4 @@
-# Trivial Oracle Cloud DNS updater via HTTP request
+# Trivial Oracle Cloud DNS updater via HTTP API
 
 This is a trivial dynamic DNS updater for Oracle Cloud: the idea is to deploy this to [OKE](https://www.oracle.com/ca-en/cloud/cloud-native/container-engine-kubernetes/)
 and have a simple HTTPS API endpoint to register my home IP address as a DNS record in the DNS zone served by Oracle DNS.
