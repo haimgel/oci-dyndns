@@ -17,7 +17,7 @@ FROM build_deps AS build
 
 COPY . .
 
-RUN CGO_ENABLED=0 go build -o oci-dyndns -ldflags '-w -extldflags "-static"' .
+RUN CGO_ENABLED=0 go build -o oci-dyndns -ldflags '-w -extldflags "-static"' cmd/main.go
 
 FROM alpine:${ALPINE_VERSION}
 
