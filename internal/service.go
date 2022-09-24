@@ -40,6 +40,18 @@ func (svc *Service) serveResponse(status int, message string, writer http.Respon
 	return json.NewEncoder(writer).Encode(response{Message: message})
 }
 
+func remoteAddress(req *http.Request) (string, error) {
+	fwdAddress := req.Header.Get("X-Forwarded-For")
+	if fwdAddress != "" {
+		return fwdAddress, nil
+	}
+	directAddress, _, err := net.SplitHostPort(req.RemoteAddr)
+	if directAddress != "" {
+		return directAddress, nil
+	}
+	return "", err
+}
+
 func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) error {
 	svc.logger.Infow("Incoming request",
 		"remoteAddr", req.RemoteAddr,
@@ -55,7 +67,7 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 		return svc.serveResponse(http.StatusForbidden, "Not authorized", w)
 	}
 
-	ipAddress, _, err := net.SplitHostPort(req.RemoteAddr)
+	ipAddress, err := remoteAddress(req)
 	if err != nil {
 		return svc.serveResponse(http.StatusInternalServerError, err.Error(), w)
 	}
