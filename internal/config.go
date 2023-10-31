@@ -3,7 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -32,7 +32,7 @@ func LoadAppConfig(fileName *string) (AppConfig, error) {
 	}
 	// noinspection GoUnhandledErrorResult
 	defer jsonFile.Close()
-	jsonBytes, err := ioutil.ReadAll(jsonFile)
+	jsonBytes, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return appConfig, fmt.Errorf("unable to read config file: %v", err)
 	}

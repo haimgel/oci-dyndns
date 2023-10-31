@@ -20,8 +20,7 @@ func createLogger() *zap.SugaredLogger {
 
 func main() {
 	logger := createLogger()
-	// noinspection GoUnhandledErrorResult
-	defer logger.Sync()
+	defer func() { _ = logger.Sync() }()
 
 	configFileName := flag.String("config", "config.json", "Configuration file name")
 	listenAddress := flag.String("listen", ":8080", "Address and port to listen to")
