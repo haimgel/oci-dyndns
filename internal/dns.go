@@ -21,22 +21,23 @@ func UpdateDns(appConfig *AppConfig, dnsClient *dns.DnsClient, ctx context.Conte
 	ttl := 60
 	retryPolicy := common.DefaultRetryPolicy()
 
-	request := dns.PatchZoneRecordsRequest{
+	request := dns.UpdateRRSetRequest{
 		CompartmentId: &appConfig.OciConfig.Tenancy,
 		ZoneNameOrId:  &appConfig.Zone,
-		PatchZoneRecordsDetails: dns.PatchZoneRecordsDetails{
-			Items: []dns.RecordOperation{
+		Domain:        &appConfig.Host,
+		Rtype:         &rtype,
+		UpdateRrSetDetails: dns.UpdateRrSetDetails{
+			Items: []dns.RecordDetails{
 				{
-					Domain:    &appConfig.Host,
-					Rtype:     &rtype,
-					Rdata:     &ipAddress,
-					Ttl:       &ttl,
-					Operation: dns.RecordOperationOperationAdd,
+					Domain: &appConfig.Host,
+					Rtype:  &rtype,
+					Rdata:  &ipAddress,
+					Ttl:    &ttl,
 				},
 			},
 		},
 		RequestMetadata: common.RequestMetadata{RetryPolicy: &retryPolicy},
 	}
-	_, err := dnsClient.PatchZoneRecords(ctx, request)
+	_, err := dnsClient.UpdateRRSet(ctx, request)
 	return err
 }
