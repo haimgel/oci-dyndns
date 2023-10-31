@@ -5,7 +5,6 @@ go 1.21
 require (
 	github.com/oracle/oci-go-sdk/v65 v65.51.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 )
 
 require (

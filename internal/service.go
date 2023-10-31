@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/oracle/oci-go-sdk/v65/dns"
 	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
 	"net"
 	"net/http"
+	"slices"
 )
 
 type Service struct {
