@@ -3,24 +3,12 @@ package main
 import (
 	"flag"
 	"github.com/haimgel/oci-dyndns/internal"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"log/slog"
+	"os"
 )
 
-func createLogger() *zap.SugaredLogger {
-	config := zap.NewProductionConfig()
-	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	logger, err := config.Build(zap.AddStacktrace(zap.ErrorLevel), zap.WithCaller(false))
-	if err != nil {
-		panic(err)
-	}
-	return logger.Sugar()
-}
-
 func main() {
-	logger := createLogger()
-	defer func() { _ = logger.Sync() }()
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 
 	configFileName := flag.String("config", "config.json", "Configuration file name")
 	listenAddress := flag.String("listen", ":8080", "Address and port to listen to")
@@ -28,14 +16,17 @@ func main() {
 
 	appConfig, err := internal.LoadAppConfig(configFileName)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error("Application load error", "err", err)
+		os.Exit(1)
 	}
 	service, err := internal.NewService(&appConfig, logger)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error("Service creation error", "err", err)
+		os.Exit(1)
 	}
 	err = service.Serve(listenAddress)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Error("Cannot start HTTP service", "err", err)
+		os.Exit(1)
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/oracle/oci-go-sdk/v65/dns"
-	"go.uber.org/zap"
+	"log/slog"
 	"net"
 	"net/http"
 	"slices"
@@ -12,7 +12,7 @@ import (
 
 type Service struct {
 	appConfig *AppConfig
-	logger    *zap.SugaredLogger
+	logger    *slog.Logger
 	dnsClient *dns.DnsClient
 }
 
@@ -20,7 +20,7 @@ type response struct {
 	Message string `json:"message"`
 }
 
-func NewService(appConfig *AppConfig, logger *zap.SugaredLogger) (*Service, error) {
+func NewService(appConfig *AppConfig, logger *slog.Logger) (*Service, error) {
 	var err error
 	svc := Service{
 		appConfig: appConfig,
@@ -33,7 +33,7 @@ func NewService(appConfig *AppConfig, logger *zap.SugaredLogger) (*Service, erro
 func (svc *Service) serveResponse(status int, message string, writer http.ResponseWriter) error {
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(status)
-	svc.logger.Infow("Serving response",
+	svc.logger.Info("Serving response",
 		"status", status,
 		"message", message,
 	)
@@ -53,7 +53,7 @@ func remoteAddress(req *http.Request) (string, error) {
 }
 
 func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) error {
-	svc.logger.Infow("Incoming request",
+	svc.logger.Info("Incoming request",
 		"remoteAddr", req.RemoteAddr,
 		"requestURI", req.RequestURI,
 		"method", req.Method,
@@ -80,7 +80,7 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 }
 
 func (svc *Service) Serve(listenAddress *string) error {
-	svc.logger.Infow("Server startup",
+	svc.logger.Info("Server startup",
 		"listen", listenAddress,
 		"domain", svc.appConfig.Zone,
 		"hostname", svc.appConfig.Host,
