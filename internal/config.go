@@ -20,7 +20,8 @@ type AppConfig struct {
 	OciConfig OciConfig `json:"oci"`
 	Zone      string    `json:"zone"`
 	Host      string    `json:"host"`
-	Token     string    `json:"token"`
+	Username  string    `json:"username"`
+	Password  string    `json:"password"`
 }
 
 func LoadAppConfig(fileName *string) (AppConfig, error) {

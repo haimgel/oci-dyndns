@@ -1,13 +1,13 @@
 package internal
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"github.com/oracle/oci-go-sdk/v65/dns"
 	"log/slog"
 	"net"
 	"net/http"
-	"slices"
 )
 
 type Service struct {
@@ -58,12 +58,17 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 		"requestURI", req.RequestURI,
 		"method", req.Method,
 	)
-	if req.Method != "POST" {
+	// Protocol: dyndns2 api
+	if req.Method != "GET" && req.Method != "POST" {
 		return svc.serveResponse(http.StatusNotFound, "Not found", w)
 	}
 
-	token := req.URL.Query()["token"]
-	if !slices.Contains(token, svc.appConfig.Token) {
+	username := req.URL.User.Username()
+	password, _ := req.URL.User.Password()
+	usernameMatch := subtle.ConstantTimeCompare([]byte(username), []byte(svc.appConfig.Username))
+	passwordMatch := subtle.ConstantTimeCompare([]byte(password), []byte(svc.appConfig.Password))
+
+	if usernameMatch != 1 || passwordMatch != 1 {
 		return svc.serveResponse(http.StatusForbidden, "Not authorized", w)
 	}
 
@@ -88,6 +93,6 @@ func (svc *Service) Serve(listenAddress *string) error {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		_ = svc.updateHandler(w, r)
 	}
-	http.HandleFunc("/update", handler)
+	http.HandleFunc("/nic/update", handler)
 	return http.ListenAndServe(*listenAddress, nil)
 }
