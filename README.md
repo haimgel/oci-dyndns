@@ -27,7 +27,8 @@ The configuration file is expected to contain the following:
 {
   "zone": "DNS zone to update",
   "host": "Host name to update, FQDN",
-  "token": "HTTP authentication token -- has to be passed as token=value in the HTTP request",
+  "username": "HTTP authentication user name",
+  "password": "HTTP authentication password",
   "oci": {
     "tenancy"              : "OCI user credentials that can update DNS records",
     "user"                 : "",
@@ -40,8 +41,8 @@ The configuration file is expected to contain the following:
 
 ## API 
 
-Only one endpoint is available: `POST /update`. The only expected parameter is `token`. Example:
+Only one endpoint is available: `GET /nic/update`. The HTTP basic authentication is expected. Example:
 ```shell
-  curl -X POST 'https://my-domain/update?token=secretValue'
+  curl 'https://username:password@my-domain/nic/update'
 ```
 
