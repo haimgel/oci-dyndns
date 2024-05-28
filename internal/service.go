@@ -62,9 +62,7 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 	if req.Method != "GET" && req.Method != "POST" {
 		return svc.serveResponse(http.StatusNotFound, "Not found", w)
 	}
-
-	username := req.URL.User.Username()
-	password, _ := req.URL.User.Password()
+	username, password, _ := req.BasicAuth()
 	usernameMatch := subtle.ConstantTimeCompare([]byte(username), []byte(svc.appConfig.Username))
 	passwordMatch := subtle.ConstantTimeCompare([]byte(password), []byte(svc.appConfig.Password))
 
