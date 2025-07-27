@@ -79,7 +79,7 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 		return svc.serveResponse(http.StatusInternalServerError, err.Error(), w)
 	}
 
-	return svc.serveResponse(http.StatusOK, fmt.Sprintf("Updated '%s' to '%s'", svc.appConfig.Host, ipAddress), w)
+	return svc.serveResponse(http.StatusOK, fmt.Sprintf("Updated hosts %v to '%s'", svc.appConfig.Hosts, ipAddress), w)
 }
 
 func (svc *Service) Serve(listenAddress *string) error {

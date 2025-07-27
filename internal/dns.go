@@ -42,7 +42,7 @@ func UpdateDns(ctx context.Context, appConfig *AppConfig, dnsClient *dns.DnsClie
 			RequestMetadata: common.RequestMetadata{RetryPolicy: &retryPolicy},
 		}
 		_, updateErr := dnsClient.UpdateRRSet(ctx, request)
-		logger.Info("DNS update", "host", host, "ipAddress", ipAddress, "result", updateErr)
+		logger.Info("DNS update", "host", host, "ipAddress", ipAddress, "error", updateErr)
 		if (updateErr != nil) && (err == nil) {
 			err = updateErr
 		}
