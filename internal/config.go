@@ -20,6 +20,7 @@ type AppConfig struct {
 	OciConfig OciConfig `json:"oci"`
 	Zone      string    `json:"zone"`
 	Host      string    `json:"host"`
+	Hosts     []string  `json:"hosts"`
 	Username  string    `json:"username"`
 	Password  string    `json:"password"`
 }
@@ -39,6 +40,16 @@ func LoadAppConfig(fileName *string) (AppConfig, error) {
 	}
 	if err := json.Unmarshal(jsonBytes, &appConfig); err != nil {
 		return appConfig, fmt.Errorf("cannot parse the config file: %v", err)
+	}
+	if appConfig.Host != "" {
+		if len(appConfig.Hosts) == 0 {
+			appConfig.Hosts = []string{appConfig.Host}
+		} else {
+			return appConfig, fmt.Errorf("either 'host' or 'hosts' must be set, not both")
+		}
+	}
+	if len(appConfig.Hosts) == 0 {
+		return appConfig, fmt.Errorf("at least one host must be set")
 	}
 	return appConfig, nil
 }

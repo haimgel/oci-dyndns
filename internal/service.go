@@ -75,7 +75,7 @@ func (svc *Service) updateHandler(w http.ResponseWriter, req *http.Request) erro
 		return svc.serveResponse(http.StatusInternalServerError, err.Error(), w)
 	}
 
-	if err := UpdateDns(svc.appConfig, svc.dnsClient, req.Context(), ipAddress); err != nil {
+	if err := UpdateDns(req.Context(), svc.appConfig, svc.dnsClient, ipAddress, svc.logger); err != nil {
 		return svc.serveResponse(http.StatusInternalServerError, err.Error(), w)
 	}
 
@@ -86,7 +86,7 @@ func (svc *Service) Serve(listenAddress *string) error {
 	svc.logger.Info("Server startup",
 		"listen", listenAddress,
 		"domain", svc.appConfig.Zone,
-		"hostname", svc.appConfig.Host,
+		"hosts", svc.appConfig.Hosts,
 	)
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		_ = svc.updateHandler(w, r)
