@@ -1,5 +1,5 @@
 # Reference: https://hub.docker.com/_/golang/tags?name=1.24-alpine
-ARG GOLANG_VERSION=1.24
+ARG GOLANG_VERSION=1.25
 ARG ALPINE_VERSION=3.22
 
 FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS build_deps
@@ -30,3 +30,8 @@ USER ${UID}
 
 EXPOSE 8080
 ENTRYPOINT ["/usr/local/bin/oci-dyndns", "--config", "/config.json"]
+
+LABEL org.opencontainers.image.title=OCI-DynDNS
+LABEL org.opencontainers.image.description="Oracle Cloud DNS updater via HTTP API"
+LABEL org.opencontainers.image.source=https://github.com/haimgel/oci-dyndns
+LABEL org.opencontainers.image.licenses=MIT
