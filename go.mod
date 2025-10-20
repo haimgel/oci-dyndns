@@ -2,7 +2,7 @@ module github.com/haimgel/oci-dyndns
 
 go 1.25
 
-require github.com/oracle/oci-go-sdk/v65 v65.101.1
+require github.com/oracle/oci-go-sdk/v65 v65.102.0
 
 require (
 	github.com/gofrs/flock v0.12.1 // indirect
