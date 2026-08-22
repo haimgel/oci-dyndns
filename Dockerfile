@@ -21,7 +21,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 go build -o oci-dyndns -ldflags '-w -extldflags "-static"' cmd/main.go
 
-FROM alpine:3.23
+FROM alpine:3.24
 ARG UID=1000
 ARG GID=1000
 
