@@ -39,10 +39,37 @@ The configuration file is expected to contain the following:
 }
 ```
 
-## API 
+## API
 
-Only one endpoint is available: `GET /nic/update`. The HTTP basic authentication is expected. Example:
+Only one endpoint is available: `/nic/update` (`GET` or `POST`). The HTTP basic authentication is expected. Example:
 ```shell
   curl 'https://username:password@my-domain/nic/update'
 ```
+
+The endpoint speaks [dyndns2](https://help.dyn.com/remote-access-api/perform-update/), so it can be used directly by
+standard clients such as `ddclient`:
+
+```
+protocol=dyndns2, server=my-domain, login=username, password=password  my-host.example.com
+```
+
+The reply is a `text/plain` dyndns2 status line. `good` and `nochg` have no equivalent in the HTTP status, so
+they are distinguished only by the body; failures keep a real HTTP status as well:
+
+| Response     | HTTP | Meaning                                                             |
+|--------------|------|---------------------------------------------------------------------|
+| `good <ip>`  | 200  | The DNS record was updated to `<ip>`                                 |
+| `nochg <ip>` | 200  | The record already held `<ip>`; nothing was written                  |
+| `badauth`    | 401  | The basic authentication credentials did not match                   |
+| `911`        | 500  | Something failed on the server side; the client should retry later   |
+
+The IP address is always the caller's own address, taken from `X-Forwarded-For` if present and from the connection
+otherwise. The `hostname` and `myip` parameters that dyndns2 clients send are ignored: the hosts to update come from
+the configuration file.
+
+Records are read before they are written, so a client polling on a short interval does not rewrite an
+already-correct record.
+
+For non-dyndns2 callers, sending `Accept: application/json` returns the outcome as `{"message": "..."}` with a
+conventional HTTP status code (200, 403 or 500) instead.
 
