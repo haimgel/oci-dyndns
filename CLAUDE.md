@@ -52,7 +52,38 @@ docker run -v /path/to/config.json:/config.json -p 8080:8080 oci-dyndns
 
 ## Go Version
 
-The project uses Go 1.25 (as specified in go.mod and .tool-versions).
+The toolchain is Go 1.26, set in `.tool-versions` and the `Dockerfile` — bump both together.
+
+`go.mod` declares `go 1.25.0`. That is the *language* version and is deliberately lower than the toolchain;
+raise it only to use newer language features, since it is the minimum for anyone building from source.
+
+Go supports a release until two newer majors exist, so plan on a major bump roughly every six months. Check
+the current support window at https://go.dev/doc/devel/release before picking a version.
+
+## Container Image
+
+`Dockerfile` builds a static binary on `golang:<version>-alpine` and ships it on a pinned `alpine:<version>`.
+
+- **Name base images inline, never behind an `ARG`.** Dependabot cannot resolve a tag behind an `ARG`
+  (dependabot-core#2057), so an `ARG`'d image is one nothing ever updates.
+- **Keep the builder on the bare `-alpine` tag.** The suffixed `-alpine<version>` variants stop being rebuilt
+  once the Go team's default Alpine moves on, which silently freezes the toolchain at an old patch release.
+  Only the runtime base needs pinning.
+- **Build locally when changing base images.** `package.yml` runs only on pushes to `main` and on tags, so a
+  Dockerfile change is not validated before merge.
+
+To check what a published image actually contains, extract the binary and inspect it directly — the toolchain
+version is recorded in the binary, not in the image metadata:
+
+```bash
+go version -m ./oci-dyndns              # toolchain and module versions
+govulncheck -mode binary ./oci-dyndns   # vulnerabilities reachable from this build
+```
+
+## Releases
+
+Releases are git tags (`vX.Y.Z`); there is no version string in the source. Pushing a tag builds the image and
+moves `:latest` onto it. Pushes to `main` publish `:main` only and leave `:latest` alone.
 
 ## Dependencies
 

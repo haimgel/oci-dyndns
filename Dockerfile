@@ -1,12 +1,8 @@
 # Reference: https://hub.docker.com/_/golang/tags?name=1.26-alpine
 #
-# Both images are named inline rather than through an ARG: Dependabot cannot resolve a version behind an ARG
-# directive, so an ARG-based tag is one nothing watches (dependabot-core#2057, #4597, #10190).
-#
-# The build image uses the bare `-alpine` tag on purpose. The suffixed `-alpine<version>` variants stop being
-# rebuilt once the Go team's default Alpine moves on, which silently freezes the toolchain at whatever patch was
-# current that day -- `golang:1.25-alpine3.22` last changed 2026-06-03, which is how :main shipped on go1.25.11
-# while 1.25.14 was out. The runtime base below stays pinned; only the builder needs to track upstream.
+# Name base images inline: Dependabot cannot resolve a tag behind an ARG (dependabot-core#2057).
+# Keep the builder on the bare `-alpine` tag: the `-alpine<version>` variants stop being rebuilt once the Go
+# team's default Alpine moves on, which freezes the toolchain. Only the runtime base below is pinned.
 FROM golang:1.26-alpine AS build_deps
 
 RUN apk add --no-cache git
