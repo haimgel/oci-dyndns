@@ -21,6 +21,24 @@ updates:
     labels:
       - "dependencies"
 
+  # Keeps the Dockerfile base images, and with them the Go toolchain, from going stale.
+  - package-ecosystem: "docker"
+    directory: "/"
+    assignees:
+      - "haimgel"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "deps"
+    groups:
+      docker:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     assignees:
