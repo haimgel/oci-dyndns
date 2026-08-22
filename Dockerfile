@@ -1,8 +1,13 @@
-# Reference: https://hub.docker.com/_/golang/tags?name=1.24-alpine
-ARG GOLANG_VERSION=1.25
-ARG ALPINE_VERSION=3.22
-
-FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS build_deps
+# Reference: https://hub.docker.com/_/golang/tags?name=1.26-alpine
+#
+# Both images are named inline rather than through an ARG: Dependabot cannot resolve a version behind an ARG
+# directive, so an ARG-based tag is one nothing watches (dependabot-core#2057, #4597, #10190).
+#
+# The build image uses the bare `-alpine` tag on purpose. The suffixed `-alpine<version>` variants stop being
+# rebuilt once the Go team's default Alpine moves on, which silently freezes the toolchain at whatever patch was
+# current that day -- `golang:1.25-alpine3.22` last changed 2026-06-03, which is how :main shipped on go1.25.11
+# while 1.25.14 was out. The runtime base below stays pinned; only the builder needs to track upstream.
+FROM golang:1.26-alpine AS build_deps
 
 RUN apk add --no-cache git
 
@@ -20,7 +25,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 go build -o oci-dyndns -ldflags '-w -extldflags "-static"' cmd/main.go
 
-FROM alpine:${ALPINE_VERSION}
+FROM alpine:3.23
 ARG UID=1000
 ARG GID=1000
 

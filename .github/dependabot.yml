@@ -21,6 +21,25 @@ updates:
     labels:
       - "dependencies"
 
+  # Watches the base images in the Dockerfile. Without this nothing tracked the Go toolchain, which is why
+  # v1.2.0 shipped on go1.24.5 and why Go 1.25 reaching end of life went unnoticed.
+  - package-ecosystem: "docker"
+    directory: "/"
+    assignees:
+      - "haimgel"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "deps"
+    groups:
+      docker:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     assignees:
