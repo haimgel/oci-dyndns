@@ -70,6 +70,6 @@ the configuration file.
 Records are read before they are written, so a client polling on a short interval does not rewrite an
 already-correct record.
 
-For non-dyndns2 callers, sending `Accept: application/json` returns the outcome as `{"message": "..."}` with a
-conventional HTTP status code (200, 403 or 500) instead.
+For non-dyndns2 callers, sending `Accept: application/json` returns the outcome as `{"message": "..."}` instead,
+under the same HTTP status codes as above. A weight of zero (`Accept: application/json;q=0`) opts back out.
 

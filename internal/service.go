@@ -8,6 +8,7 @@ import (
 	"mime"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -49,11 +50,15 @@ func NewService(appConfig *AppConfig, logger *slog.Logger) (*Service, error) {
 // does not count: dyndns2 is the default dialect of this endpoint.
 func wantsJSON(req *http.Request) bool {
 	for _, accept := range strings.Split(req.Header.Get("Accept"), ",") {
-		if mediaType, _, err := mime.ParseMediaType(strings.TrimSpace(accept)); err == nil {
-			if mediaType == "application/json" {
-				return true
-			}
+		mediaType, params, err := mime.ParseMediaType(strings.TrimSpace(accept))
+		if err != nil || mediaType != "application/json" {
+			continue
 		}
+		// RFC 9110: a weight of zero says the media type is explicitly *not* acceptable.
+		if weight, err := strconv.ParseFloat(params["q"], 64); err == nil && weight == 0 {
+			continue
+		}
+		return true
 	}
 	return false
 }

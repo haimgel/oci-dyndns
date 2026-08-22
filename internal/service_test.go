@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/oracle/oci-go-sdk/v65/dns"
 	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/oracle/oci-go-sdk/v65/dns"
 )
 
 // fakeDnsClient records the calls made against it and replays canned RRSet contents.
@@ -195,6 +194,11 @@ func TestJsonErrorKeepsHttpStatus(t *testing.T) {
 	if writer.Code != http.StatusInternalServerError {
 		t.Errorf("HTTP status = %d, want %d", writer.Code, http.StatusInternalServerError)
 	}
+}
+
+func TestZeroWeightAcceptIsPlainText(t *testing.T) {
+	// `q=0` is an explicit "not acceptable", the opposite of asking for JSON.
+	checkPlainText(t, call(testService(&fakeDnsClient{}), "application/json;q=0"), http.StatusOK, "good 203.0.113.7")
 }
 
 func TestWildcardAcceptIsPlainText(t *testing.T) {
