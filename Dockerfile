@@ -3,7 +3,7 @@
 # Name base images inline: Dependabot cannot resolve a tag behind an ARG (dependabot-core#2057).
 # Keep the builder on the bare `-alpine` tag: the `-alpine<version>` variants stop being rebuilt once the Go
 # team's default Alpine moves on, which freezes the toolchain. Only the runtime base below is pinned.
-FROM golang:1.26-alpine AS build_deps
+FROM golang:1.27-alpine AS build_deps
 
 RUN apk add --no-cache git
 
